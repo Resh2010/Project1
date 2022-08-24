@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {FormGroup,FormBuilder, Validators} from '@angular/forms';
 import { Router } from '@angular/router';
+import { TemplateRef,ViewChild, ElementRef } from'@angular/core';
+import {  FormControl, AbstractControl } from'@angular/forms';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -14,33 +16,28 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.loginForm=this.formBuilder.group({
-      name: ['', Validators.required],
-      password:['',Validators.required]
+      name: ['', [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$')]],
+      password:['',[Validators.required, Validators.pattern('(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!#^~%*?&,.<>"\'\\;:\{\\\}\\\[\\\]\\\|\\\+\\\-\\\=\\\_\\\)\\\(\\\)\\\`\\\/\\\\\\]])[A-Za-z0-9\d$@].{7,}')]]
     })
+
+    //this.Form = this.frombuilders.group({
+  // Email: ['', [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$')]],
+   //Password: ['', [Validators.required, Validators.pattern('(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!#^~%*?&,.<>"\'\\;:\{\\\}\\\[\\\]\\\|\\\+\\\-\\\=\\\_\\\)\\\(\\\)\\\`\\\/\\\\\\]])[A-Za-z0-9\d$@].{7,}')]],
+//});
   }
   login(){
-    alert("username is "+this.loginForm.value.name);
-    alert("password is "+this.loginForm.value.password);
 
 
+    var loginData:any={};
+    loginData.Username=this.loginForm.value.name;
+    loginData.Password=this.loginForm.value.password;
 
-   
-    // const user = (values: any) => {
-    //   {
-    //     // return a.email === this.loginForm.value.email &&
-    //     //   a.password === this.loginForm.value.password
-    //     return this.loginForm.value.email === "reshma" &&
-    //       this.loginForm.value.password === "12345"
-    //   };
-    // }
-    //   if (user){
-    //     alert("Login Success");
-    //     this.loginForm.reset();
-       
-    //   }else{
-    //     alert("User not found!!");
-    //   }
-    // }
+    var observe=this.http.post("https://localhost:44317/login/logincheck",loginData);
+    observe.subscribe(rex=>this.success(rex),rex=>this.error(rex));
   }
+  success(rex:any){
+    this.router.navigate(['/welcome'])
+  }
+  error(rex:any){}
 
 }
